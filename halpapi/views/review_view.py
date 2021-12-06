@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseServerError
 
 
-class PostView(ViewSet):
+class ReviewView(ViewSet):
     """Rare posts"""
 
     def list(self, request):

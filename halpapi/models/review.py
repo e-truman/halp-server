@@ -6,7 +6,7 @@ class Review(models.Model):
     community_resource_id = models.ForeignKey("Community_Resource", on_delete=models.CASCADE)
     title = models.CharField(max_length=55)
     content = models.TextField()
-    rating = models.DecimalField
-    created_on = models.DateField()
+    rating = models.FloatField()
+    created_on = models.DateTimeField(auto_now_add=True) 
     is_published = models.BooleanField(default=False)
     approved = models.BooleanField(default=False) 

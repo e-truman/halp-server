@@ -6,4 +6,4 @@ class Reviewer(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.URLField()
-    created_on = models.DateField()
+    created_on = models.DateTimeField(auto_now_add=True)
