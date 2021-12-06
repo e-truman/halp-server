@@ -4,7 +4,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
 from rest_framework.decorators import action
-from rareapi.models import Post, Author, Category
+from halpapi.models import Review, Reviewer, Community_Resource
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.http import HttpResponseServerError
@@ -20,18 +20,18 @@ class ReviewView(ViewSet):
             Response -- JSON serialized list of games
         """
 
-        posts = Post.objects.all()
+        reviews = Review.objects.all()
 
         # Support filtering games by author
         #   http://localhost:8000/posts?author_id=${authorId}
         #
         # That URL will retrieve all posts by specific user
-        author = self.request.query_params.get('author', None)
-        if author is not None:
-            posts = posts.filter(author__id=author)
+        reviewer = self.request.query_params.get('reviewer', None)
+        if reviewer is not None:
+            reviews = reviews.filter(reviewer__id=reviewer)
 
-        posts_serial = PostSerializer(
-            posts, many=True, context={'request': request})
+        posts_serial = ReviewSerializer(
+            reviews, many=True, context={'request': request})
         # No need for a context since we're using ModelSerializer.
 
         return Response(posts_serial.data)
@@ -44,22 +44,23 @@ class ReviewView(ViewSet):
         """
 
         # Uses the token passed in the 'Authorization' header
-        author = Author.objects.get(user=request.auth.user)
-        category = Category.objects.get(pk=request.data["categoryId"])
+        reviewer = Reviewer.objects.get(user=request.auth.user)
+        community_resource_id = Community_Resource.objects.get(pk=request.data["communityResourceId"])
         publication_date = date.today()
         try:
 
-            post = Post.objects.create(
-                author=author,
-                category=category,
+            post = Review.objects.create(
+                reviewer=reviewer,
+                community_resource_id=community_resource_id,
                 title=request.data["title"],
                 content=request.data["content"],
-                image_url=request.data["imageUrl"],
-                publication_date=publication_date,
-                is_published=False,
-                approved=False
+                rating=request.data["rating"],
+                is_published=True,
+                approved=True
+
+    
             )
-            serializer = PostSerializer(post)
+            serializer = ReviewSerializer(post)
             return Response(serializer.data)
 
         # If anything went wrong, catch the exception and
@@ -75,8 +76,8 @@ class ReviewView(ViewSet):
             Response -- JSON serialized game instance
         """
         try:
-            post = Post.objects.get(pk=pk)
-            serializer = PostSerializer(post, context={'request': request})
+            review = Review.objects.get(pk=pk)
+            serializer = ReviewSerializer(review, context={'request': request})
             #packages data to send back using event serializer at bottom, names it as serializer. result of method call is what is on variable. calling eventserializer and passing in parameters
             return Response(serializer.data) #calling response- a class. passing in the data
         except Exception as ex:
@@ -86,51 +87,53 @@ class ReviewView(ViewSet):
     def publish(self, request, pk=None):
         """Managing publish / unpublish buttons"""
 
-        post = Post.objects.get(pk=pk)
+        review = Review.objects.get(pk=pk)
 
-        if post.is_published is not True:
-            post.is_published = True
-            post.save()
+        if review.is_published is not True:
+            review.is_published = True
+            review.save()
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         else:
-            post.is_published = False
-            post.save()
+            review.is_published = False
+            review.save()
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class Community_ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Category
-        fields = ('id', 'label')
+        model = Community_Resource
+        fields = ('id', 'contact','contact_type', 'street_address', 'phone_number', 'notes' )
+
 
 
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'username')
+        fields = ('id', 'first_name', 'last_name', 'username', 'is_admin')
 
 
-class AuthorSerializer(serializers.ModelSerializer):
+class ReviewerSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     class Meta:
-        model = Author
-        fields = ('id', 'user')
+        model = Reviewer
+        fields = ('id', 'user', 'profile_pic')
 
 
-class PostSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
     """JSON serializer for posts
 
     Arguments:
         serializer type
     """
-    author = AuthorSerializer()
-    category = CategorySerializer()
+    reviewer = ReviewerSerializer()
+    community_resource_id = Community_ResourceSerializer()
 
     class Meta:
-        model = Post
-        fields = ('id', 'author', 'category', 'title', 'content',
-                  'image_url', 'publication_date', 'is_published', 'approved')
+        model = Review
+        fields = ('id', 'reviewer', 'community_resource_id', 'title', 'content',
+                  'rating', 'created_on', 'is_published', 'approved')
         depth = 2
+

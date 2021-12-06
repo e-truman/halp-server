@@ -52,14 +52,13 @@ def register_user(request):
         email=request.data['email'],
         username=request.data['username'],
         password=request.data['password'],
-        is_admin=request.data['is_admin']
     )
 
     # Now save the extra info in the halpapi_reviewer table
     reviewer = Reviewer.objects.create(
         user=new_user,
-        profile_pic=request.data['profile_img_url'],
-        created_on=request.data['created_on'],
+        profile_pic=request.data['profilePic'],
+        is_admin=request.data['is_admin']
     )
 
     # Use the REST Framework's token generator on the new user account
