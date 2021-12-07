@@ -115,12 +115,12 @@ class TagView(ViewSet):
         # Get the current authenticated user
         author = Author.objects.get(user=request.auth.user)
         # Get all game records from the database
-        tags = Tag.objects.all()
+        reactions = Reaction.objects.all()
 
 
 
-        serializer = TagSerializer(
-            tags, many=True, context={'request': request}) #add many=true if you get more than one response
+        serializer = ReactionSerializer(
+            reactions, many=True, context={'request': request}) #add many=true if you get more than one response
         return Response(serializer.data)
 
 class UserSerializer(serializers.ModelSerializer):

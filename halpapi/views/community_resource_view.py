@@ -29,7 +29,7 @@ class ComunityResourceView(ViewSet):
 
         contact_type = self.request.query_params.get('contact_type', None)
         if contact_type is not None:
-            posts = community_resources.filter(contact_type=contact_type)
+            community_resources = community_resources.filter(contact_type=contact_type)
 
         community_resource_serial = Community_Resource_Serializer(
             community_resources, many=True, context={'request': request})
