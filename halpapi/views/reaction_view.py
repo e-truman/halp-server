@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import action
 
 
-class TagView(ViewSet):
+class ReactionView(ViewSet):
     """Rare Publishing"""
 
     def create(self, request):
@@ -63,30 +63,13 @@ class TagView(ViewSet):
             #   http://localhost:8000/games/2
             #
             # The `2` at the end of the route becomes `pk`
-            tag = Tag.objects.get(pk=pk)
+            reaction = Reaction.objects.get(pk=pk)
             serializer = TagSerializer(tag, context={'request': request})
             #packages data to send back using event serializer at bottom, names it as serializer. result of method call is what is on variable. calling eventserializer and passing in parameters
             return Response(serializer.data) #calling response- a class. passing in the data
         except Exception as ex:
             return HttpResponseServerError(ex) #catches all errors, but want to be specific. can tell what to tell client based on why things not working
 
-    def update(self, request, pk=None):
-        """Handle PUT requests for a game
-
-        Returns:
-            Response -- Empty body with 204 status code
-        """
-        tag = Tag.objects.get(pk=pk)
-        # Do mostly the same thing as POST, but instead of
-        # creating a new instance of Game, get the game record
-        # from the database whose primary key is `pk`
-        tag.label=request.data["label"]
-        
-        tag.save()
-
-        # 204 status code means everything worked but the
-        # server is not sending back any data in the response
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
         """Handle DELETE requests for a single game
@@ -95,12 +78,12 @@ class TagView(ViewSet):
             Response -- 200, 404, or 500 status code
         """
         try:
-            tag = Tag.objects.get(pk=pk)
+            tag = Reaction.objects.get(pk=pk)
             tag.delete()
 
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
-        except Tag.DoesNotExist as ex:
+        except Reaction.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as ex:
