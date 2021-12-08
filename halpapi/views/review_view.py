@@ -51,7 +51,7 @@ class ReviewView(ViewSet):
 
             review = Review.objects.create(
                 reviewer=reviewer,
-                community_resource=community_resource_id,
+                community_resource=community_resource,
                 title=request.data["title"],
                 content=request.data["content"],
                 rating=request.data["rating"],
@@ -60,7 +60,7 @@ class ReviewView(ViewSet):
 
     
             )
-            serializer = ReviewSerializer(post)
+            serializer = ReviewSerializer(review)
             return Response(serializer.data)
 
         # If anything went wrong, catch the exception and
