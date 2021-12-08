@@ -45,13 +45,13 @@ class ReviewView(ViewSet):
 
         # Uses the token passed in the 'Authorization' header
         reviewer = Reviewer.objects.get(user=request.auth.user)
-        community_resource_id = Community_Resource.objects.get(pk=request.data["communityResourceId"])
+        community_resource = Community_Resource.objects.get(pk=request.data["communityResourceId"])
         publication_date = date.today()
         try:
 
-            post = Review.objects.create(
+            review = Review.objects.create(
                 reviewer=reviewer,
-                community_resource_id=community_resource_id,
+                community_resource=community_resource_id,
                 title=request.data["title"],
                 content=request.data["content"],
                 rating=request.data["rating"],
@@ -111,7 +111,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'username', 'is_admin')
+        fields = ('id', 'first_name', 'last_name', 'username')
 
 
 class ReviewerSerializer(serializers.ModelSerializer):
@@ -119,7 +119,7 @@ class ReviewerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reviewer
-        fields = ('id', 'user', 'profile_pic')
+        fields = ('id', 'user', 'profile_pic', 'is_admin')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -129,11 +129,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         serializer type
     """
     reviewer = ReviewerSerializer()
-    community_resource_id = Community_ResourceSerializer()
+    community_resource = Community_ResourceSerializer()
 
     class Meta:
         model = Review
-        fields = ('id', 'reviewer', 'community_resource_id', 'title', 'content',
-                  'rating', 'created_on', 'is_published', 'approved')
+        fields = ('id', 'reviewer', 'community_resource', 'title', 'content',
+                  'rating', 'created_on', 'is_published', 'approved', 'reactions')
         depth = 2
 
