@@ -109,20 +109,20 @@ class ReviewView(ViewSet):
             Response -- Empty body with 204 status code
         """
         reviewer = Reviewer.objects.get(user=request.auth.user)
+        community_resource= Community_Resource.objects.get(pk=request.data["communityResourceId"])
 
         # Do mostly the same thing as POST, but instead of
         # creating a new instance of Game, get the game record
         # from the database whose primary key is `pk`
         review = Review.objects.get(pk=pk)
         review.reviewer = reviewer
-        review.community_resource = request.data["Community_Resource"]
+        review.community_resource = community_resource
         review.title = request.data["title"]
         review.content = request.data["content"]
-        review.rating =request.data["rating"]
+        review.rating =request.data["rating"]   
         review.created_on =request.data["createdOn"]
         review.is_published =request.data["isPublished"]
         review.approved =request.data["approved"]
-        review.reactions =request.data["reactions"]
 
      
         review.save()
