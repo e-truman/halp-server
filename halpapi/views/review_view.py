@@ -101,6 +101,37 @@ class ReviewView(ViewSet):
         except Exception as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+    def update(self, request, pk=None):
+        """Handle PUT requests for a review
+
+        Returns:
+            Response -- Empty body with 204 status code
+        """
+        reviewer = Reviewer.objects.get(user=request.auth.user)
+
+        # Do mostly the same thing as POST, but instead of
+        # creating a new instance of Game, get the game record
+        # from the database whose primary key is `pk`
+        review = Review.objects.get(pk=pk)
+        review.reviewer = reviewer
+        review.community_resource = request.data["Community_Resource"]
+        review.title = request.data["title"]
+        review.content = request.data["content"]
+        review.rating =request.data["rating"]
+        review.created_on =request.data["createdOn"]
+        review.is_published =request.data["isPublished"]
+        review.approved =request.data["approved"]
+        review.reactions =request.data["reactions"]
+
+     
+        review.save()
+
+
+        # 204 status code means everything worked but the
+        # server is not sending back any data in the response
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
+
     @action(methods=['put'], detail=True)
     def publish(self, request, pk=None):
         """Managing publish / unpublish buttons"""
