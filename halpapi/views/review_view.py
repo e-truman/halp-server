@@ -30,6 +30,10 @@ class ReviewView(ViewSet):
         if reviewer is not None:
             reviews = reviews.filter(reviewer__id=reviewer)
 
+        community_resource = self.request.query_params.get('community_resource', None)
+        if community_resource is not None:
+            reviews = reviews.filter(community_resource__id=community_resource)
+
         posts_serial = ReviewSerializer(
             reviews, many=True, context={'request': request})
         # No need for a context since we're using ModelSerializer.

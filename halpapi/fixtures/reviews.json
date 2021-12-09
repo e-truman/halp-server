@@ -15,7 +15,21 @@
     },
     {
         "model": "halpapi.review",
-        "pk": 2,
+        "pk": 4,
+        "fields": {
+            "reviewer": 1,
+            "community_resource": 5,
+            "title": "Great Organization",
+            "content": "lorem ipsum",
+            "rating": 4.4,
+            "created_on": "1600-12-12 03:22",
+            "is_published": true,
+            "approved": true
+        }
+    },
+    {
+        "model": "halpapi.review",
+        "pk": 3,
         "fields": {
             "reviewer": 1,
             "community_resource": 1,
