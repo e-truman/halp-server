@@ -1,0 +1,10 @@
+[
+    {
+        "model": "halpapi.review_reaction",
+        "pk": 1,
+        "fields": {
+            "review": 3,
+            "reaction": 1
+        }
+    }
+]

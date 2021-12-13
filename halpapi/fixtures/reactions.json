@@ -1,0 +1,23 @@
+[
+    {
+        "model": "halpapi.reaction",
+        "pk": 1,
+        "fields": {
+            "is_liked": false
+        }
+    },
+    {
+        "model": "halpapi.reaction",
+        "pk": 2,
+        "fields": {
+            "is_liked": true
+        }
+    },
+    {
+        "model": "halpapi.reaction",
+        "pk": 3,
+        "fields": {
+            "is_liked": true 
+        }
+    }
+]
