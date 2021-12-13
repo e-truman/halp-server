@@ -4,7 +4,8 @@
         "pk": 1,
         "fields": {
             "review": 3,
-            "reaction": 1
+            "reaction": 1,
+            "reviewer": 1
         }
     }
 ]
