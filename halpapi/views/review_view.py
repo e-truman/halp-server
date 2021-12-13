@@ -11,7 +11,7 @@ from django.http import HttpResponseServerError
 
 
 class ReviewView(ViewSet):
-    """Rare posts"""
+    """Halp reviews"""
 
     def list(self, request):
         """Handles GET request for all games
@@ -22,10 +22,6 @@ class ReviewView(ViewSet):
 
         reviews = Review.objects.all()
 
-        # Support filtering games by author
-        #   http://localhost:8000/posts?author_id=${authorId}
-        #
-        # That URL will retrieve all posts by specific user
         reviewer = self.request.query_params.get('reviewer', None)
         if reviewer is not None:
             reviews = reviews.filter(reviewer__id=reviewer)
@@ -34,17 +30,17 @@ class ReviewView(ViewSet):
         if community_resource is not None:
             reviews = reviews.filter(community_resource__id=community_resource)
 
-        posts_serial = ReviewSerializer(
+        review_serial = ReviewSerializer(
             reviews, many=True, context={'request': request})
         # No need for a context since we're using ModelSerializer.
 
-        return Response(posts_serial.data)
+        return Response(review_serial.data)
 
     def create(self, request):
         """Handle POST OPERATIONS
 
         Returns:
-            Response -- JSON serialized post instance
+            Response -- JSON serialized review instance
         """
 
         # Uses the token passed in the 'Authorization' header
@@ -74,7 +70,7 @@ class ReviewView(ViewSet):
             return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
-        """Handle GET requests for single post
+        """Handle GET requests for single review
 
         Returns:
             Response -- JSON serialized game instance
@@ -88,7 +84,7 @@ class ReviewView(ViewSet):
             return HttpResponseServerError(ex) #catches all errors, but want to 
 
     def destroy(self, request, pk=None):
-        """Handle DELETE requests for a single game
+        """Handle DELETE requests for a single review
 
         Returns:
             Response -- 200, 404, or 500 status code
@@ -176,7 +172,7 @@ class ReviewerSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    """JSON serializer for posts
+    """JSON serializer for reviews
 
     Arguments:
         serializer type
