@@ -17,12 +17,12 @@ from django.contrib import admin
 from django.conf.urls import include
 from django.urls import path
 from rest_framework import routers
-from halpapi.views import register_user, login_user, ReviewView, ComunityResourceView
+from halpapi.views import register_user, login_user, ReviewView, ComunityResourceView, ReactionView
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'reviews', ReviewView, 'post')
 router.register(r'community_resources', ComunityResourceView, 'community_resource')
-
+router.register(r'reactions', ReactionView, 'reaction')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

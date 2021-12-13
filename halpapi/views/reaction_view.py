@@ -38,7 +38,7 @@ class ReactionView(ViewSet):
 
 
             reaction = Reaction.objects.create(
-                label=request.data["label"],
+                is_liked=request.data["is_liked"],
             )
             serializer = ReactionSerializer(is_liked, context={'request': request})
             return Response(serializer.data)
@@ -64,7 +64,7 @@ class ReactionView(ViewSet):
             #
             # The `2` at the end of the route becomes `pk`
             reaction = Reaction.objects.get(pk=pk)
-            serializer = TagSerializer(tag, context={'request': request})
+            serializer = ReactionSerializer(reaction, context={'request': request})
             #packages data to send back using event serializer at bottom, names it as serializer. result of method call is what is on variable. calling eventserializer and passing in parameters
             return Response(serializer.data) #calling response- a class. passing in the data
         except Exception as ex:
@@ -78,8 +78,8 @@ class ReactionView(ViewSet):
             Response -- 200, 404, or 500 status code
         """
         try:
-            tag = Reaction.objects.get(pk=pk)
-            tag.delete()
+            reaction = Reaction.objects.get(pk=pk)
+            reaction.delete()
 
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
@@ -96,7 +96,7 @@ class ReactionView(ViewSet):
             Response -- JSON serialized list of games
         """
         # Get the current authenticated user
-        author = Author.objects.get(user=request.auth.user)
+        author = Reviewer.objects.get(user=request.auth.user)
         # Get all game records from the database
         reactions = Reaction.objects.all()
 
