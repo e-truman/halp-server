@@ -8,6 +8,11 @@ from halpapi.models import Review, Reviewer, Community_Resource, Reaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.http import HttpResponseServerError
+from rest_framework.decorators import action
+
+from halpapi.models.review_reaction import Review_Reaction
+from halpapi.views.reaction_view import ReactionSerializer
+
 
 
 class ReviewView(ViewSet):
@@ -19,16 +24,29 @@ class ReviewView(ViewSet):
         Returns:
             Response -- JSON serialized list of games
         """
-
+        current_user = Reviewer.objects.get(user=request.auth.user)
         reviews = Review.objects.all()
+
 
         reviewer = self.request.query_params.get('reviewer', None)
         if reviewer is not None:
-            reviews = reviews.filter(reviewer__id=reviewer)
+            reviews = reviews.filter(reviewer__user=request.auth.user)
 
         community_resource = self.request.query_params.get('community_resource', None)
         if community_resource is not None:
             reviews = reviews.filter(community_resource__id=community_resource)
+
+       
+        for review in reviews:
+            # show all the reactions this user has, don't show as liked if no reaction
+            review.current_user_reactions =[]
+            reactions = review.review_reaction_set.all()
+            reactions = reactions.filter(reviewer=current_user)
+            # review.current_user_reactions = reactions.reaction
+            for review_reaction in reactions:
+                review.current_user_reactions.append(review_reaction.reaction)
+
+            
 
         review_serial = ReviewSerializer(
             reviews, many=True, context={'request': request})
@@ -133,18 +151,18 @@ class ReviewView(ViewSet):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['put'], detail=True)
-    def publish(self, request, pk=None):
+    def react(self, request, pk=None):
         """Managing publish / unpublish buttons"""
 
         review = Review.objects.get(pk=pk)
 
-        if review.is_published is not True:
-            review.is_published = True
-            review.save()
+        if review.reactions.is_liked is not True:
+            review.reactions.is_liked = True
+            review.reactions.save()
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         else:
-            review.is_published = False
-            review.save()
+            review.reactions.is_liked= False
+            review.reactions.save()
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -154,7 +172,7 @@ class ReviewView(ViewSet):
         """Managing gamers signing up for events"""
         # Django uses the `Authorization` header to determine
         # which user is making the request to sign up
-        reaction = Reaction.objects.get(pk=pk) #how to specify which reaction
+        #how to specify which reaction
 
 
 
@@ -173,13 +191,24 @@ class ReviewView(ViewSet):
 
         # A gamer wants to sign up for an event
         if request.method == "POST":
-            try:
+            # try:
+
+                reaction=Reaction.objects.get(is_liked=request.data['reactions']) 
+
                 # Using the attendees field on the event makes it simple to add a gamer to the event
                 # .add(gamer) will insert into the join table a new row the gamer_id and the event_id
-                review.reactions.add(reaction)
+                
+                review,_ = Review_Reaction.objects.get_or_create(
+                review= review,
+                reviewer = Reviewer.objects.get(user=request.auth.user)
+            )
+                review.reaction = reaction
+                review.save()
+                
                 return Response({}, status=status.HTTP_201_CREATED)
-            except Exception as ex:
-                return Response({'message': ex.args[0]})
+    
+            # except Exception as ex:
+            #     return Response({'message': ex.args[0]})
 
         # User wants to leave a previously joined event
         elif request.method == "DELETE":
@@ -215,8 +244,12 @@ class ReviewerSerializer(serializers.ModelSerializer):
         model = Reviewer
         fields = ('id', 'user', 'profile_pic', 'is_admin')
 
+class ReactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reaction
+        fields = ('is_liked',)
 
-class ReviewSerializer(serializers.ModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer): 
     """JSON serializer for reviews
 
     Arguments:
@@ -224,10 +257,11 @@ class ReviewSerializer(serializers.ModelSerializer):
     """
     reviewer = ReviewerSerializer()
     community_resource = Community_ResourceSerializer()
+    current_user_reactions = ReactionSerializer(many=True)
 
     class Meta:
         model = Review
         fields = ('id', 'reviewer', 'community_resource', 'title', 'content',
-                  'rating', 'created_on', 'is_published', 'approved', 'reactions')
+                  'rating', 'created_on', 'is_published', 'approved', 'reactions','current_user_reactions')
         depth = 2
 
