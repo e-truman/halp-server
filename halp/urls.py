@@ -30,3 +30,10 @@ urlpatterns = [
     path('login', login_user),
     path('', include(router.urls))
 ]
+
+
+
+
+
+
+# http://localhost:8000/reviews/${ reviewId }/react`

@@ -4,7 +4,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers, status
 from rest_framework.decorators import action
-from halpapi.models import Review, Reviewer, Community_Resource
+from halpapi.models import Review, Reviewer, Community_Resource, Reaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.http import HttpResponseServerError
@@ -146,6 +146,51 @@ class ReviewView(ViewSet):
             review.is_published = False
             review.save()
             return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+    @action(methods=['post', 'delete'], detail=True)
+    def react(self, request, pk=None):
+        """Managing gamers signing up for events"""
+        # Django uses the `Authorization` header to determine
+        # which user is making the request to sign up
+        reaction = Reaction.objects.get(pk=pk) #how to specify which reaction
+
+
+
+        # reviewer = Reviewer.objects.get(user=request.auth.user)
+        # community_resource= Community_Resource.objects.get(pk=request.data["communityResourceId"])
+
+        try:
+            # Handle the case if the client specifies a game
+            # that doesn't exist
+           review = Review.objects.get(pk=pk)
+        except Review.DoesNotExist:
+            return Response(
+                {'message': 'Event does not exist.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # A gamer wants to sign up for an event
+        if request.method == "POST":
+            try:
+                # Using the attendees field on the event makes it simple to add a gamer to the event
+                # .add(gamer) will insert into the join table a new row the gamer_id and the event_id
+                review.reactions.add(reaction)
+                return Response({}, status=status.HTTP_201_CREATED)
+            except Exception as ex:
+                return Response({'message': ex.args[0]})
+
+        # User wants to leave a previously joined event
+        elif request.method == "DELETE":
+            try:
+                # The many to many relationship has a .remove method that removes the gamer from the attendees list
+                # The method deletes the row in the join table that has the gamer_id and event_id
+                review.reactions.remove(reaction)
+                return Response(None, status=status.HTTP_204_NO_CONTENT)
+            except Exception as ex:
+                return Response({'message': ex.args[0]})
+
 
 
 class Community_ResourceSerializer(serializers.ModelSerializer):
