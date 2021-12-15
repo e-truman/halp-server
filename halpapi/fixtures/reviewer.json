@@ -1,0 +1,13 @@
+[
+    {
+        "model": "halpapi.review",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "profile_pic": "https://media-exp1.licdn.com/dms/image/C4E03AQE9jx5ID2IRmA/profile-displayphoto-shrink_400_400/0/1638820281246?e=1645056000&v=beta&t=hmbDRh40cQKS0OFAJByooD6weKOij-77iKFuVqK_8Vg",
+            "created_on": "1990-12-12 03:22",
+            "is_admin": true
+        }
+    }
+]
+
