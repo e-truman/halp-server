@@ -93,8 +93,21 @@ class ReviewView(ViewSet):
         Returns:
             Response -- JSON serialized game instance
         """
+        
+
+
+
+
         try:
             review = Review.objects.get(pk=pk)
+
+
+            current_user = Reviewer.objects.get(user=request.auth.user)
+            review.current_user_reactions =[]
+            reactions = review.review_reaction_set.all()
+            reactions = reactions.filter(reviewer=current_user)
+
+            
             serializer = ReviewSerializer(review, context={'request': request})
             #packages data to send back using event serializer at bottom, names it as serializer. result of method call is what is on variable. calling eventserializer and passing in parameters
             return Response(serializer.data) #calling response- a class. passing in the data
@@ -204,7 +217,7 @@ class ReviewView(ViewSet):
             )
                 review.reaction = reaction
                 review.save()
-                
+
                 return Response({}, status=status.HTTP_201_CREATED)
     
             # except Exception as ex:
