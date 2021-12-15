@@ -5,7 +5,7 @@ class Community_Resource(models.Model):
     contact = models.TextField() 
     contact_type = models.TextField()
     street_address = models.CharField(max_length=55) 
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=55)
     notes = models.TextField()
     # geocoded_column = models.TextField() #how to use location dictionary
    
