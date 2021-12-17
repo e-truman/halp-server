@@ -26,13 +26,6 @@ class ReviewerView(ViewSet):
         """
         reviewer = Reviewer.objects.get(user=request.auth.user)
 
-        
-
-        # Support filtering games by type
-        #    http://localhost:8000/games?type=1
-        #
-        # That URL will retrieve all tabletop games
-        
 
         serializer = ReviewerSerializer(
             reviewer, many=False, context={'request': request})
