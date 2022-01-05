@@ -8,9 +8,10 @@ from halpapi.models import Review, Reviewer, Community_Resource, community_resou
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.http import HttpResponseServerError
+from django.db.models import Q
 
 
-class ComunityResourceView(ViewSet):
+class CommunityResourceView(ViewSet):
     """Rare posts"""
 
     def list(self, request):
@@ -31,9 +32,17 @@ class ComunityResourceView(ViewSet):
         if contact_type is not None:
             community_resources = community_resources.filter(contact_type=contact_type)
 
+        # search_text = self.request.query_params.get('q', None)
+        # Community_Resource.objects.filter(
+        #     Q(contact_type__contains=search_text) |
+        #     Q(contact__contains=search_text) |
+        #     Q(street_address__contains=search_text) |
+        #     Q(notes__contains=search_text) )
+
         community_resource_serial = Community_Resource_Serializer(
             community_resources, many=True, context={'request': request})
         # No need for a context since we're using ModelSerializer.
+
 
         return Response(community_resource_serial.data)
 
