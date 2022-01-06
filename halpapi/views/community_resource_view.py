@@ -23,21 +23,19 @@ class CommunityResourceView(ViewSet):
 
         community_resources = Community_Resource.objects.all()
 
-        # Support filtering games by author
-        #   http://localhost:8000/posts?author_id=${authorId}
-        #
-        # That URL will retrieve all posts by specific user
 
         contact_type = self.request.query_params.get('contact_type', None)
         if contact_type is not None:
             community_resources = community_resources.filter(contact_type=contact_type)
 
-        # search_text = self.request.query_params.get('q', None)
-        # Community_Resource.objects.filter(
-        #     Q(contact_type__contains=search_text) |
-        #     Q(contact__contains=search_text) |
-        #     Q(street_address__contains=search_text) |
-        #     Q(notes__contains=search_text) )
+        search_text = self.request.query_params.get('q', None)
+        if search_text is not None:
+            community_resources = Community_Resource.objects.filter(
+                Q(contact_type__icontains=search_text) |
+                Q(contact__icontains=search_text) |
+                Q(street_address__icontains=search_text) |
+                Q(notes__icontains=search_text) 
+                )
 
         community_resource_serial = Community_Resource_Serializer(
             community_resources, many=True, context={'request': request})
