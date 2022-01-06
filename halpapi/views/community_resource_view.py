@@ -39,7 +39,6 @@ class CommunityResourceView(ViewSet):
 
         community_resource_serial = Community_Resource_Serializer(
             community_resources, many=True, context={'request': request})
-        # No need for a context since we're using ModelSerializer.
 
 
         return Response(community_resource_serial.data)
