@@ -63,8 +63,9 @@ class ReviewerView(ViewSet):
             Response -- 200, 404, or 500 status code
         """
         try:
-            reviewer = Reviewer.objects.get(user=request.auth.user)
-            reviewer.delete()
+            user = request.auth.user
+            user.delete()
+           
 
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 

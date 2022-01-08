@@ -39,4 +39,3 @@ urlpatterns = [
 
 
 
-# http://localhost:8000/reviews/${ reviewId }/react`

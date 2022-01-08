@@ -31,14 +31,14 @@ def user_profile(request):
         #     reviews = reviews.filter(community_resource__id=community_resource)
 
        
-        for review in reviews:
-            # show all the reactions this user has, don't show as liked if no reaction
-            review.current_user_reactions =[]
-            reactions = review.review_reaction_set.all()
-            reactions = reactions.filter(reviewer=current_user)
-            # review.current_user_reactions = reactions.reaction
-            for review_reaction in reactions:
-                review.current_user_reactions.append(review_reaction.reaction)
+        # for review in reviews:
+        #     # show all the reactions this user has, don't show as liked if no reaction
+        #     review.current_user_reactions =[]
+        #     reactions = review.review_reaction_set.all()
+        #     reactions = reactions.filter(reviewer=current_user)
+        #     # review.current_user_reactions = reactions.reaction
+        #     for review_reaction in reactions:
+        #         review.current_user_reactions.append(review_reaction.reaction)
 
             
 
