@@ -31,25 +31,21 @@ def user_profile(request):
         #     reviews = reviews.filter(community_resource__id=community_resource)
 
        
-        # for review in reviews:
-        #     # show all the reactions this user has, don't show as liked if no reaction
-        #     review.current_user_reactions =[]
-        #     reactions = review.review_reaction_set.all()
-        #     reactions = reactions.filter(reviewer=current_user)
-        #     # review.current_user_reactions = reactions.reaction
-        #     for review_reaction in reactions:
-        #         review.current_user_reactions.append(review_reaction.reaction)
+        for review in reviews:
+            # show all the reactions this user has, don't show as liked if no reaction
+            review.current_user_reactions =[]
+            reactions = review.review_reaction_set.all()
+            reactions = reactions.filter(reviewer=current_user)
+            # review.current_user_reactions = reactions.reaction
+            for review_reaction in reactions:
+                review.current_user_reactions.append(review_reaction.reaction)
 
             
 
         review_serial = ReviewSerializer(
             reviews, many=True, context={'request': request})
 
-
-
-
-
-    
+ 
     # current_user = Reviewer.objects.get(user=request.auth.user)
     # TODO: Use the django orm to filter events if the gamer is attending the event
     # review.current_user_reactions =[]
@@ -95,13 +91,31 @@ class Community_ResourceSerializer(serializers.ModelSerializer):
         model = Community_Resource
         fields = ('id', 'contact','contact_type', 'street_address', 'phone_number', 'notes' )
 
+@action(methods=['DELETE'], detail=False)
+def destroy(self, request, pk=None):
+        """Handle DELETE requests for a single review
 
+        Returns:
+            Response -- 200, 404, or 500 status code
+        """
+        try:
+            user = request.auth.user
+            user.delete()
+           
+
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+        except Reviewer.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'username')
+        fields = ('id', 'first_name', 'last_name', 'username', 'email')
 
 
 class ReviewerSerializer(serializers.ModelSerializer):
@@ -144,7 +158,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'username')
+        fields = ('id', 'first_name', 'last_name', 'username', 'email')
 
 
 class ReviewerSerializer(serializers.ModelSerializer):

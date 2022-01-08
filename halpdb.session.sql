@@ -1,1 +1,2 @@
-DELETE FROM halpapi_reaction
+DELETE FROM auth_user
+WHERE id=6
