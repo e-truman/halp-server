@@ -17,18 +17,21 @@ from django.contrib import admin
 from django.conf.urls import include
 from django.urls import path
 from rest_framework import routers
-from halpapi.views import register_user, login_user, ReviewView, ComunityResourceView, ReactionView
+from halpapi.views import register_user, login_user, ReviewView, CommunityResourceView, ReactionView, user_profile, ReviewerView
 
 router = routers.DefaultRouter(trailing_slash=False)
-router.register(r'reviews', ReviewView, 'post')
-router.register(r'community_resources', ComunityResourceView, 'community_resource')
+router.register(r'reviews', ReviewView, 'review')
+router.register(r'reviewers', ReviewerView, 'reviewer')
+router.register(r'community_resources', CommunityResourceView, 'community_resource')
 router.register(r'reactions', ReactionView, 'reaction')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register', register_user),
     path('login', login_user),
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('api-auth', include('rest_framework.urls', namespace='rest_framework')),
+    path('profile', user_profile),
 ]
 
 
@@ -36,4 +39,3 @@ urlpatterns = [
 
 
 
-# http://localhost:8000/reviews/${ reviewId }/react`
