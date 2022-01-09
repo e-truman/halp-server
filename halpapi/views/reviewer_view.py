@@ -121,7 +121,7 @@ class ReviewerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reviewer
-        fields = ('id', 'user', 'profile_pic', 'is_admin')
+        fields = ('id', 'user', 'profile_pic', 'is_admin', 'created_on')
 
 
 
