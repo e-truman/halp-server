@@ -84,22 +84,21 @@ class ReviewerView(ViewSet):
         """
 
         user = request.auth.user
-        reviewer = Reviewer.objects.get(user=request.auth.user)
+        reviewer = Reviewer.objects.get(pk=pk)
         
 
         # Do mostly the same thing as POST, but instead of
         # creating a new instance of Game, get the game record
         # from the database whose primary key is `pk`
-        user.first_name = request.data['first_name']
-        user.last_name = request.data['last_name']
-        user.username = request.data['username']
-        user.email = request.data['email']
+        user.first_name = request.data['firstName']
+        reviewer.user.last_name = request.data['lastName']
+        reviewer.user.username = request.data['username']
+        reviewer.user.email = request.data['email']
+        reviewer.created_on = request.data['created_on']
         reviewer.profile_pic = request.data['profile_pic']
         if request.data.get('password', None):
             user.set_password(request.data['password'])
         user.save()
-
-     
         reviewer.save()
 
 
