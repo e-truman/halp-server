@@ -65,7 +65,6 @@ class ReviewView(ViewSet):
         reviewer = Reviewer.objects.get(user=request.auth.user)
 
         community_resource = Community_Resource.objects.get(pk=request.data["communityResourceId"])
-        publication_date = date.today()
         current_user = Reviewer.objects.get(user=request.auth.user)
         
         try:
